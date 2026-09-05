@@ -7,7 +7,7 @@
     body { margin: 0; font-family: sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
     header { background-color: white; padding: 15px 30px; border-bottom: 2px solid #ddd; display: flex; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); height: 40px; }
     .app-container { display: flex; flex: 1; height: calc(100vh - 72px); }
-    aside { background-color: white; padding: 20px; border-right: 2px solid #ddd; display: flex; flex-direction: column; align-items: flex-start; gap: 15px; box-shadow: 2px 0 5px rgba(0,0,0,0.05); width: 200px; min-width: 200px; }
+    aside { background-color: white; padding: 20px; border-right: 2px solid #ddd; display: flex; flex-direction: column; align-items: flex-start; gap: 15px; box-shadow: 2px 0 5px rgba(0,0,0,0.05); width: 200px; }
     main { flex: 1; padding: 15px; background-color: #f1f2f6; display: flex; overflow: auto; }
     .whiteboard { background: white !important; border: 3px solid #333; border-radius: 8px; cursor: crosshair; max-width: 100%; max-height: 100%; }
     header img { height: 40px; margin-right: 15px; }
@@ -55,7 +55,7 @@
 
   <script>
     const urlSearch = new URLSearchParams(window.location.search);
-    if (urlSearch.has('whiteboard') {
+    if (urlSearch.has('whiteboard')) {
       const whiteboard = urlSearch.get('whiteboard');
       open(whiteboard);
     }
@@ -90,18 +90,30 @@
     ['mouseup', 'mouseleave', 'touchend', 'touchcancel'].forEach(ev => canvas.addEventListener(ev, stopDraw));
 
     function restore() {
-      document.getElementById('recoverPopup').innerHTML = `<button onclick="document.getElementById('recoverPopup').close()" style="width: auto; float: right; background-color:#747d8c;">X</button><h3 style="margin-top:40px;">Enter whiteboard name</h3><input type="text" id="findName" value="Untitled Whiteboard" style="padding: 8px; width:80%; margin-bottom: 15px;"><button onclick="find()">Find</button>`;
+      document.getElementById('recoverPopup').innerHTML = `<button onclick="document.getElementById('recoverPopup').close()" style="width: auto; float: right; background-color:#747d8c;">X</button><h3>Select a drawing to restore</h3><div style="max-height: 400px; overflow-y: auto; text-align: left;"></div>`;
+      const container = document.querySelector('div[style*="max-height"]');
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key !== 'savedDrawings') {
+          const btn = document.createElement('button');
+          btn.textContent = key;
+          btn.onclick = () => find(key);
+          btn.style.marginBottom = '10px';
+          container.appendChild(btn);
+        }
+      }
     }
 
-    function find() {
-      let name = document.getElementById('findName').value, data = localStorage.getItem(name);
+    function find(name) {
+      let data = localStorage.getItem(name);
       document.getElementById('recoverPopup').innerHTML = `<div class="loader"></div><p>Loading data...</p>`;
       setTimeout(() => {
         if (data) {
-          const img = new Image(); img.src = data;
+          const img = new Image(); 
+          img.src = data;
           img.onload = () => { ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.drawImage(img, 0, 0); document.getElementById('recoverPopup').close(); };
         } else {
-          document.getElementById('recoverPopup').innerHTML = `<p>Could not find "${name}".</p><div class="popup-buttons"><button onclick="restore()">Try Again</button><button onclick="document.getElementById('recoverPopup').close()">Close</button></div>`;
+          document.getElementById('recoverPopup').innerHTML = `<p>Could not find "${name}".</p><div class="popup-buttons"><button onclick="restore()">Try Again</button><button onclick="document.getElementById('recoverPopup').close()">Cancel</button></div>`;
         }
       }, 1000);
     }
@@ -111,11 +123,13 @@
     function open(name) {
       document.getElementById('recoverPopup').innerHTML = `<div class="loader"></div><p>Loading data...</p>`;
       setTimeout(() => {
+        let data = localStorage.getItem(name);
         if (data) {
-          const img = new Image(); img.src = data;
+          const img = new Image(); 
+          img.src = data;
           img.onload = () => { ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.drawImage(img, 0, 0); document.getElementById('recoverPopup').close(); };
         } else {
-          document.getElementById('recoverPopup').innerHTML = `<p>Could not find "${name}".</p><div class="popup-buttons"><button onclick="restore()">Try Again</button><button onclick="document.getElementById('recoverPopup').close()">Close</button></div>`;
+          document.getElementById('recoverPopup').innerHTML = `<p>Could not find "${name}".</p><div class="popup-buttons"><button onclick="restore()">Try Again</button><button onclick="document.getElementById('recoverPopup').close()">Cancel</button></div>`;
         }
       }, 1000);
     }
