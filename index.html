@@ -120,13 +120,12 @@
 
     function drawType(mode) { currentMode = mode; updateBrush(); drawBtn.style.opacity = mode === 'pen' ? '1' : '0.6'; eraserBtn.style.opacity = mode === 'eraser' ? '1' : '0.6'; }
 
-    function open(name) {
+    function open(url) {
       document.getElementById('recoverPopup').innerHTML = `<div class="loader"></div><p>Loading data...</p>`;
       setTimeout(() => {
-        let data = localStorage.getItem(name);
         if (data) {
           const img = new Image(); 
-          img.src = data;
+          img.src = url;
           img.onload = () => { ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.drawImage(img, 0, 0); document.getElementById('recoverPopup').close(); };
         } else {
           document.getElementById('recoverPopup').innerHTML = `<p>Could not find "${name}".</p><div class="popup-buttons"><button onclick="restore()">Try Again</button><button onclick="document.getElementById('recoverPopup').close()">Cancel</button></div>`;
