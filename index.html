@@ -54,6 +54,11 @@
   </dialog>
 
   <script>
+    const urlSearch = new URLSearchParams(window.location.search);
+    if (urlSearch.has('whiteboard') {
+      const whiteboard = urlSearch.get('whiteboard');
+      open(whiteboard);
+    }
     const [drawBtn, eraserBtn, savedStatusText, canvas, colorPicker, sizePicker] = ['p', 'e', 'savedStatus', 'paintCanvas', 'pickColor', 'number'].map(id => document.getElementById(id));
     const ctx = canvas.getContext('2d');
     let drawing = false, currentMode = "pen";
@@ -102,6 +107,18 @@
     }
 
     function drawType(mode) { currentMode = mode; updateBrush(); drawBtn.style.opacity = mode === 'pen' ? '1' : '0.6'; eraserBtn.style.opacity = mode === 'eraser' ? '1' : '0.6'; }
+
+    function open(name) {
+      document.getElementById('recoverPopup').innerHTML = `<div class="loader"></div><p>Loading data...</p>`;
+      setTimeout(() => {
+        if (data) {
+          const img = new Image(); img.src = data;
+          img.onload = () => { ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.drawImage(img, 0, 0); document.getElementById('recoverPopup').close(); };
+        } else {
+          document.getElementById('recoverPopup').innerHTML = `<p>Could not find "${name}".</p><div class="popup-buttons"><button onclick="restore()">Try Again</button><button onclick="document.getElementById('recoverPopup').close()">Close</button></div>`;
+        }
+      }, 1000);
+    }
   </script>
 </body>
 </html>
