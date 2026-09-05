@@ -14,8 +14,9 @@
     header h1 { margin: 0; font-size: 28px; color: #e54c30; }
     button { background-color: blue; color: white; border: none; border-radius: 4px; padding: 10px 20px; font-size: 14px; font-weight: bold; cursor: pointer; width: 100%; }
     button:hover { background-color: darkblue; }
-    button:focus { outline: 2px solid blue; }
+    .tool-button:focus { outline: 2px solid blue; }
     header input { margin-left: auto; margin-right: 10px; }
+    header buttton { margin-left: auto; }
     #number { width: 60px; padding: 5px; font-size: 16px; }
     #name { width: 90%; padding: 6px; font-size: 14px; }
     dialog { border: 3px solid #333; border-radius: 8px; padding: 25px; text-align: center; width: 320px; }
@@ -33,13 +34,14 @@
     <h1>Johnny Whiteboard</h1>
     <input type="color" id="pickColor" value="#000000">
     <input type="number" id="number" value="10" min="1">
+    <button onclick="share()">Share</button>
   </header>
 
   <div class="app-container">
     <aside>
       <input type="text" id="name" value="Untitled Whiteboard">
-      <button id="p" onclick="drawType('pen')">Pen 🖌️</button>
-      <button id="e" onclick="drawType('eraser')">Eraser 🧽</button>
+      <button class="tool-button" id="p" onclick="drawType('pen')">Pen 🖌️</button>
+      <button class="tool-button" id="e" onclick="drawType('eraser')">Eraser 🧽</button>
       <p id="savedStatus">All Changes Saved.</p>
     </aside>
     <main><canvas id="paintCanvas" class="whiteboard" width="1000" height="700"></canvas></main>
@@ -53,7 +55,16 @@
     </div>
   </dialog>
 
+  <dialog id="share">
+    <button onclick="document.getElementById("share").close()></button>
+    <h3>Share</h3>
+    <input type="text" id="linkText" value="Please Wait... Your link will be here...">
+    <button onclick="copyLink()">Copy</button>
+    <button onclick="johnnyShare()">Share with Johnny Share</button>
+  </dialog>
+  
   <script>
+    let link = null;
     const urlSearch = new URLSearchParams(window.location.search);
     if (urlSearch.has('whiteboard')) {
       const whiteboard = urlSearch.get('whiteboard');
@@ -131,6 +142,20 @@
           document.getElementById('recoverPopup').innerHTML = `<p>Could not find "${name}".</p><div class="popup-buttons"><button onclick="restore()">Try Again</button><button onclick="document.getElementById('recoverPopup').close()">Cancel</button></div>`;
         }
       }, 1000);
+    }
+
+    function share() {
+      document.getElementById("share").showModal();
+      link = canvas.toDataURL;
+      document.getElementById("linkText").innerText = link;
+    }
+
+    function copyLink() {
+      navigator.clipboard.writeText(link);  
+    }
+
+    function johnnyShare() {
+      window.location.href = "johnny0robot.github.io/drive/?share=true&shareUrl=" + link + "&redrictUrl=johnny0robot.github.io/whiteboard/?whiteboard=" + document.getElementById("name").value + "&shared=true";
     }
   </script>
 </body>
