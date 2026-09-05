@@ -1,162 +1,264 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"><title>Johnny Whiteboard</title>
-  <link rel="icon" href="https://github.com/johnny0robot/whiteboard/blob/main/Untitled%20design%20(4).png?raw=true">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Johnny Whiteboard</title>
+  <link rel="icon" href="https://github.com/johnny0robot/whiteboard/raw/main/Untitled%20design%20(4).png">
   <style>
-    body { margin: 0; font-family: sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-    header { background-color: white; padding: 15px 30px; border-bottom: 2px solid #ddd; display: flex; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); height: 40px; }
-    .app-container { display: flex; flex: 1; height: calc(100vh - 72px); }
-    aside { background-color: white; padding: 20px; border-right: 2px solid #ddd; display: flex; flex-direction: column; align-items: flex-start; gap: 15px; box-shadow: 2px 0 5px rgba(0,0,0,0.05); width: 200px; }
-    main { flex: 1; padding: 15px; background-color: #f1f2f6; display: flex; overflow: auto; }
-    .whiteboard { background: white !important; border: 3px solid #333; border-radius: 8px; cursor: crosshair; max-width: 100%; max-height: 100%; }
-    header img { height: 40px; margin-right: 15px; }
-    header h1 { margin: 0; font-size: 28px; color: #e54c30; }
-    button { background-color: blue; color: white; border: none; border-radius: 4px; padding: 10px 20px; font-size: 14px; font-weight: bold; cursor: pointer; width: 100%; }
-    button:hover { background-color: darkblue; }
-    .tool-button:focus { outline: 2px solid blue; }
-    header input { margin-left: auto; margin-right: 10px; }
-    header buttton { margin-left: auto; }
-    #number { width: 60px; padding: 5px; font-size: 16px; }
-    #name { width: 90%; padding: 6px; font-size: 14px; }
-    dialog { border: 3px solid #333; border-radius: 8px; padding: 25px; text-align: center; width: 320px; }
-    dialog h3 { margin-top: 0; color: #333; }
-    .popup-buttons { display: flex; gap: 15px; margin-top: 20px; }
-    .popup-buttons button { flex: 1; }
-    .loader { width: 60px; height: 60px; border: 6px solid rgba(229, 76, 48, 0.2); border-top: 6px solid #e54c30; border-radius: 50%; animation: spin 1s linear infinite; margin: 20px auto; }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    :root { --accent: #e54c30; }
+    body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; display: flex; flex-direction: column; height: 100vh; }
+    header { background-color: #fff; padding: 12px 20px; border-bottom: 1px solid #e6e6e6; display: flex; align-items: center; gap: 12px; }
+    .app-container { display: flex; flex: 1; height: calc(100vh - 56px); }
+    aside { background-color: #fff; padding: 16px; border-right: 1px solid #e6e6e6; display: flex; flex-direction: column; gap: 12px; width: 220px; box-sizing: border-box; }
+    main { flex: 1; padding: 16px; background-color: #f6f7fb; display: flex; align-items: center; justify-content: center; overflow: auto; }
+    .whiteboard { background: white; border: 3px solid #333; border-radius: 8px; cursor: crosshair; max-width: 100%; max-height: 100%; }
+    header img { height: 36px; width: 36px; object-fit: contain; }
+    header h1 { margin: 0; font-size: 20px; color: var(--accent); }
+    button { background-color: #1e90ff; color: white; border: none; border-radius: 6px; padding: 8px 12px; font-size: 14px; cursor: pointer; }
+    button.secondary { background-color: #6c757d; }
+    .tool-button { text-align: left; padding: 8px 10px; }
+    .tool-button.active { outline: 2px solid #1e90ff; }
+    input[type="text"], input[type="number"], input[type="color"] { padding: 6px; border-radius: 6px; border: 1px solid #ddd; }
+    #savedStatus { font-size: 13px; color: #666; }
+    dialog { border: none; border-radius: 8px; padding: 18px; box-shadow: 0 6px 30px rgba(0,0,0,0.15); }
+    .popup-buttons { display: flex; gap: 10px; margin-top: 14px; }
+    .loader { width: 48px; height: 48px; border: 6px solid rgba(229,76,48,0.2); border-top: 6px solid var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin: 12px auto; }
+    @keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }
+    .recover-list { max-height: 220px; overflow: auto; margin-top: 8px; display: flex; flex-direction: column; gap: 8px; }
   </style>
 </head>
 <body>
 
   <header>
-    <img src="https://github.com/johnny0robot/whiteboard/blob/main/Untitled%20design%20(4).png?raw=true" alt="logo">
+    <img src="https://github.com/johnny0robot/whiteboard/raw/main/Untitled%20design%20(4).png" alt="logo">
     <h1>Johnny Whiteboard</h1>
-    <input type="color" id="pickColor" value="#000000">
-    <input type="number" id="number" value="10" min="1">
-    <button onclick="share()">Share</button>
+    <input type="color" id="pickColor" value="#000000" title="Brush color">
+    <input type="number" id="number" value="10" min="1" max="200" style="width:72px;" title="Brush size">
+    <input type="text" id="name" value="Untitled Whiteboard" style="margin-left:8px;">
+    <button onclick="share()" style="margin-left:auto;">Share</button>
   </header>
 
   <div class="app-container">
     <aside>
-      <input type="text" id="name" value="Untitled Whiteboard">
-      <button class="tool-button" id="p" onclick="drawType('pen')">Pen 🖌️</button>
+      <button class="tool-button active" id="p" onclick="drawType('pen')">Pen 🖌️</button>
       <button class="tool-button" id="e" onclick="drawType('eraser')">Eraser 🧽</button>
+      <div style="display:flex; gap:8px; width:100%;">
+        <button onclick="saveCurrent()">Save</button>
+        <button class="secondary" onclick="document.getElementById('recoverPopup').showModal()">Recover</button>
+      </div>
       <p id="savedStatus">All Changes Saved.</p>
     </aside>
-    <main><canvas id="paintCanvas" class="whiteboard" width="1000" height="700"></canvas></main>
+    <main>
+      <canvas id="paintCanvas" class="whiteboard" width="1000" height="700"></canvas>
+    </main>
   </div>
 
   <dialog id="recoverPopup">
-    <h3>Would you like to recover your work?</h3>
+    <h3>Recover saved whiteboards</h3>
+    <div class="recover-list" id="recoverList"></div>
     <div class="popup-buttons">
-      <button onclick="restore()" style="background-color: #2ed573;">Yes</button>
-      <button onclick="document.getElementById('recoverPopup').close()" style="background-color: #ff4757;">No</button>
+      <button onclick="document.getElementById('recoverPopup').close()" class="secondary">Close</button>
     </div>
   </dialog>
 
-  <dialog id="share">
-    <button onclick="document.getElementById("share").close()></button>
+  <dialog id="shareDialog">
     <h3>Share</h3>
-    <input type="text" id="linkText" value="Please Wait... Your link will be here...">
-    <button onclick="copyLink()">Copy</button>
-    <button onclick="johnnyShare()">Share with Johnny Share</button>
+    <p style="font-size:13px;color:#333;">Copy the image URL below or open it in a new tab.</p>
+    <input type="text" id="linkText" value="" style="width:100%; margin-top:8px;">
+    <div class="popup-buttons">
+      <button onclick="copyLink()">Copy</button>
+      <button class="secondary" onclick="johnnyShare()">Share with Johnny Drive</button>
+      <button onclick="document.getElementById('shareDialog').close()" class="secondary">Close</button>
+    </div>
   </dialog>
   
   <script>
-    let link = null;
-    const urlSearch = new URLSearchParams(window.location.search);
-    if (urlSearch.has('whiteboard')) {
-      const whiteboard = urlSearch.get('whiteboard');
-      open(whiteboard);
-    }
-    const [drawBtn, eraserBtn, savedStatusText, canvas, colorPicker, sizePicker] = ['p', 'e', 'savedStatus', 'paintCanvas', 'pickColor', 'number'].map(id => document.getElementById(id));
+    // Elements
+    const canvas = document.getElementById('paintCanvas');
     const ctx = canvas.getContext('2d');
-    let drawing = false, currentMode = "pen";
+    const colorPicker = document.getElementById('pickColor');
+    const sizePicker = document.getElementById('number');
+    const savedStatusText = document.getElementById('savedStatus');
+    const drawBtn = document.getElementById('p');
+    const eraserBtn = document.getElementById('e');
+    const nameInput = document.getElementById('name');
 
+    let drawing = false;
+    let currentMode = 'pen';
+    let link = null;
+
+    // Setup
+    canvas.style.touchAction = 'none';
     ctx.lineCap = 'round';
-    const updateBrush = () => { ctx.lineWidth = sizePicker.value; ctx.strokeStyle = currentMode === "pen" ? colorPicker.value : '#ffffff'; };
-    ['input', 'change'].forEach(ev => [colorPicker, sizePicker].forEach(el => el.addEventListener(ev, updateBrush)));
+    function updateBrush() {
+      ctx.lineWidth = Math.max(1, Number(sizePicker.value) || 1);
+      ctx.strokeStyle = currentMode === 'pen' ? colorPicker.value : '#ffffff';
+      if (currentMode === 'eraser') ctx.globalCompositeOperation = 'destination-out'; else ctx.globalCompositeOperation = 'source-over';
+    }
+    updateBrush();
 
-    window.addEventListener('load', () => localStorage.getItem('savedDrawings') && document.getElementById('recoverPopup').showModal());
-
-    const getPos = (e) => {
+    // Events
+    function getPos(e) {
       const rect = canvas.getBoundingClientRect();
-      const t = e.touches ? e.touches[0] : e;
+      const t = e.touches && e.touches[0] ? e.touches[0] : e;
       return { x: (t.clientX - rect.left) * (canvas.width / rect.width), y: (t.clientY - rect.top) * (canvas.height / rect.height) };
-    };
+    }
 
-    const startDraw = (e) => { drawing = true; if(e.cancelable) e.preventDefault(); const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); };
-    const moveDraw = (e) => {
-      if (!drawing) return; if(e.cancelable) e.preventDefault(); const p = getPos(e);
-      ctx.lineTo(p.x, p.y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(p.x, p.y);
-      savedStatusText.innerText = "Saving...";
-      localStorage.setItem('savedDrawings', 'true'); localStorage.setItem(document.getElementById("name").value, canvas.toDataURL());
-      savedStatusText.innerText = "All Changes Saved.";
-    };
-    const stopDraw = () => { drawing = false; ctx.beginPath(); };
+    function startDraw(e) {
+      drawing = true;
+      if (e.cancelable) e.preventDefault();
+      const p = getPos(e);
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+    }
 
-    ['mousedown', 'touchstart'].forEach(ev => canvas.addEventListener(ev, startDraw));
-    ['mousemove', 'touchmove'].forEach(ev => canvas.addEventListener(ev, moveDraw));
-    ['mouseup', 'mouseleave', 'touchend', 'touchcancel'].forEach(ev => canvas.addEventListener(ev, stopDraw));
+    function moveDraw(e) {
+      if (!drawing) return;
+      if (e.cancelable) e.preventDefault();
+      const p = getPos(e);
+      ctx.lineTo(p.x, p.y);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+      savedStatusText.innerText = 'Saving...';
+      // Save a quick thumbnail in localStorage (not full performance-optimized)
+      try {
+        localStorage.setItem('savedDrawings', 'true');
+        localStorage.setItem(nameInput.value || 'Untitled', canvas.toDataURL());
+      } catch (err) {
+        // Quota errors are possible, ignore gracefully
+        console.warn('Could not autosave', err);
+      }
+      savedStatusText.innerText = 'All Changes Saved.';
+    }
 
-    function restore() {
-      document.getElementById('recoverPopup').innerHTML = `<button onclick="document.getElementById('recoverPopup').close()" style="width: auto; float: right; background-color:#747d8c;">X</button><h3>Select a drawing to restore</h3><div style="max-height: 400px; overflow-y: auto; text-align: left;"></div>`;
-      const container = document.querySelector('div[style*="max-height"]');
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key !== 'savedDrawings') {
-          const btn = document.createElement('button');
-          btn.textContent = key;
-          btn.onclick = () => find(key);
-          btn.style.marginBottom = '10px';
-          container.appendChild(btn);
-        }
+    function stopDraw() {
+      if (!drawing) return;
+      drawing = false;
+      ctx.beginPath();
+      // save final
+      saveCurrent();
+    }
+
+    ['mousedown','touchstart'].forEach(ev => canvas.addEventListener(ev, startDraw, { passive: false }));
+    ['mousemove','touchmove'].forEach(ev => canvas.addEventListener(ev, moveDraw, { passive: false }));
+    ['mouseup','mouseleave','touchend','touchcancel'].forEach(ev => canvas.addEventListener(ev, stopDraw));
+
+    // Tools
+    function drawType(mode) {
+      currentMode = mode;
+      updateBrush();
+      drawBtn.classList.toggle('active', mode === 'pen');
+      eraserBtn.classList.toggle('active', mode === 'eraser');
+    }
+
+    // Save / Restore
+    function saveCurrent() {
+      try {
+        const key = nameInput.value || 'Untitled';
+        const data = canvas.toDataURL();
+        localStorage.setItem(key, data);
+        localStorage.setItem('savedDrawings', 'true');
+        savedStatusText.innerText = 'All Changes Saved.';
+      } catch (err) {
+        savedStatusText.innerText = 'Save failed';
+        console.warn(err);
       }
     }
 
-    function find(name) {
-      let data = localStorage.getItem(name);
-      document.getElementById('recoverPopup').innerHTML = `<div class="loader"></div><p>Loading data...</p>`;
-      setTimeout(() => {
-        if (data) {
-          const img = new Image(); 
-          img.src = data;
-          img.onload = () => { ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.drawImage(img, 0, 0); document.getElementById('recoverPopup').close(); };
-        } else {
-          document.getElementById('recoverPopup').innerHTML = `<p>Could not find "${name}".</p><div class="popup-buttons"><button onclick="restore()">Try Again</button><button onclick="document.getElementById('recoverPopup').close()">Cancel</button></div>`;
-        }
-      }, 1000);
+    function listSaved() {
+      const container = document.getElementById('recoverList');
+      container.innerHTML = '';
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key === 'savedDrawings') continue;
+        const val = localStorage.getItem(key);
+        if (!val || !val.startsWith('data:image')) continue;
+        const row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.justifyContent = 'space-between';
+        row.style.alignItems = 'center';
+        const label = document.createElement('span');
+        label.textContent = key;
+        const btns = document.createElement('div');
+        const openBtn = document.createElement('button');
+        openBtn.textContent = 'Open';
+        openBtn.onclick = () => loadFromData(val);
+        const delBtn = document.createElement('button');
+        delBtn.textContent = 'Delete';
+        delBtn.className = 'secondary';
+        delBtn.onclick = () => { if (confirm('Delete "' + key + '"?')) { localStorage.removeItem(key); listSaved(); } };
+        btns.appendChild(openBtn);
+        btns.appendChild(delBtn);
+        row.appendChild(label);
+        row.appendChild(btns);
+        container.appendChild(row);
+      }
     }
 
-    function drawType(mode) { currentMode = mode; updateBrush(); drawBtn.style.opacity = mode === 'pen' ? '1' : '0.6'; eraserBtn.style.opacity = mode === 'eraser' ? '1' : '0.6'; }
-
-    function open(url) {
-      document.getElementById('recoverPopup').innerHTML = `<div class="loader"></div><p>Loading data...</p>`;
-      setTimeout(() => {
-        if (data) {
-          const img = new Image(); 
-          img.src = url;
-          img.onload = () => { ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.drawImage(img, 0, 0); document.getElementById('recoverPopup').close(); };
-        } else {
-          document.getElementById('recoverPopup').innerHTML = `<p>Could not find "${name}".</p><div class="popup-buttons"><button onclick="restore()">Try Again</button><button onclick="document.getElementById('recoverPopup').close()">Cancel</button></div>`;
-        }
-      }, 1000);
+    function loadFromData(dataUrl) {
+      const img = new Image();
+      img.onload = () => {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        document.getElementById('recoverPopup').close();
+      };
+      img.onerror = () => alert('Failed to load image');
+      img.src = dataUrl;
     }
 
+    window.addEventListener('load', () => {
+      // Show recover dialog if any saved drawings exist
+      if (localStorage.getItem('savedDrawings')) {
+        listSaved();
+        document.getElementById('recoverPopup').showModal();
+      }
+
+      // If ?whiteboard= is present, try to open it
+      const urlSearch = new URLSearchParams(window.location.search);
+      if (urlSearch.has('whiteboard')) {
+        const whiteboard = urlSearch.get('whiteboard');
+        // If parameter looks like a local key, try localStorage; otherwise try as URL
+        if (whiteboard.startsWith('data:image')) loadFromData(whiteboard);
+        else if (localStorage.getItem(whiteboard)) loadFromData(localStorage.getItem(whiteboard));
+        else loadFromURL(whiteboard);
+      }
+    });
+
+    function loadFromURL(url) {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => { ctx.clearRect(0,0,canvas.width,canvas.height); ctx.drawImage(img,0,0,canvas.width,canvas.height); };
+      img.onerror = () => console.warn('Could not load remote whiteboard:', url);
+      img.src = url;
+    }
+
+    // Sharing
     function share() {
-      document.getElementById("share").showModal();
-      link = canvas.toDataURL;
-      document.getElementById("linkText").innerText = link;
+      document.getElementById('shareDialog').showModal();
+      try {
+        link = canvas.toDataURL();
+        document.getElementById('linkText').value = link;
+      } catch (err) {
+        document.getElementById('linkText').value = '';
+      }
     }
 
     function copyLink() {
-      navigator.clipboard.writeText(link);  
+      if (!link) return alert('No link to copy');
+      navigator.clipboard.writeText(link).then(() => alert('Copied to clipboard'), () => alert('Copy failed'));
     }
 
     function johnnyShare() {
-      window.location.href = "johnny0robot.github.io/drive/?share=true&shareUrl=" + link + "&redrictUrl=johnny0robot.github.io/whiteboard/?whiteboard=" + document.getElementById("name").value + "&shared=true";
+      if (!link) return alert('No image to share');
+      const shareUrl = 'https://johnny0robot.github.io/drive/?share=true&shareUrl=' + encodeURIComponent(link) + '&redirectUrl=' + encodeURIComponent('https://johnny0robot.github.io/whiteboard/?whiteboard=' + encodeURIComponent(nameInput.value || 'Untitled'));
+      window.open(shareUrl, '_blank');
     }
+
+    // Update brush when inputs change
+    [colorPicker, sizePicker].forEach(el => el.addEventListener('input', updateBrush));
+
   </script>
 </body>
 </html>
